@@ -1,6 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Login / Signup pages par footer hide
+  if (pathname === "/login" || pathname === "/signup") {
+    return null;
+  }
+
   return (
     <footer className="border-t border-zinc-200/70 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">

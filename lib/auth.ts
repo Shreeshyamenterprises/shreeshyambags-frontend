@@ -1,14 +1,20 @@
-export function getToken(): string | null {
+const TOKEN_KEY = "token";
+
+export function getToken() {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem("token");
+  return localStorage.getItem(TOKEN_KEY);
 }
 
 export function setToken(token: string) {
   if (typeof window === "undefined") return;
-  localStorage.setItem("token", token);
+  localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function removeToken() {
   if (typeof window === "undefined") return;
-  localStorage.removeItem("token");
+  localStorage.removeItem(TOKEN_KEY);
+}
+
+export function isLoggedIn() {
+  return !!getToken();
 }
