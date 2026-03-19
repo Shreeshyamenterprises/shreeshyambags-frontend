@@ -87,10 +87,16 @@ export function Navbar() {
     load();
   }, [load]);
 
+  const hideNavbar = pathname === "/login" || pathname === "/signup";
+
+  if (hideNavbar) {
+    return null;
+  }
+
   function handleLogout() {
     logout();
     setOpen(false);
-    router.push("/");
+    router.replace("/login");
   }
 
   function closeMenu() {

@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
-import { setToken } from "@/lib/auth";
+import { isLoggedIn } from "@/lib/auth";
+import { useAuthStore } from "@/store/auth-store";
 
 type FormData = {
   identifier: string;
@@ -41,6 +42,7 @@ function validateForm(data: FormData): FormErrors {
 
 export default function LoginPage() {
   const router = useRouter();
+  const storeLogin = useAuthStore((s) => s.login);
 
   const [form, setForm] = useState<FormData>({
     identifier: "",
@@ -50,6 +52,12 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isLoggedIn()) {
+      router.replace("/");
+    }
+  }, []);
 
   const googleLoginUrl = useMemo(() => {
     const base =
@@ -88,10 +96,10 @@ export default function LoginPage() {
       });
 
       if (res.data?.token) {
-        setToken(res.data.token);
+        storeLogin(res.data.token);
 
         setTimeout(() => {
-          router.replace("/dashboard");
+          router.replace("/");
         }, 100);
 
         return;
@@ -137,7 +145,7 @@ export default function LoginPage() {
                     Shree Shyam Bags
                   </p>
                   <h1 className="mt-5 max-w-lg text-4xl font-bold leading-tight text-white">
-                    Welcome back to premium non-woven bag ordering.
+                    Welcome back to Shree Shyam Bags
                   </h1>
                   <p className="mt-5 max-w-md text-sm leading-7 text-zinc-300">
                     Login to manage orders, request bulk quotes, compare GSM

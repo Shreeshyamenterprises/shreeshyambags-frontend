@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { isLoggedIn } from "@/lib/auth";
 import { ProductCard } from "@/components/products/product-card";
 import { Product } from "@/types";
 
@@ -108,10 +110,15 @@ function ClientLogoPill({ name }: ClientLogo) {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isLoggedIn()) {
+      router.replace("/login");
+      return;
+    }
     loadProducts();
   }, []);
 
@@ -140,21 +147,21 @@ export default function HomePage() {
       title: "D-Cut Bags",
       description:
         "Popular for retail stores, medical shops and lightweight packaging.",
-      image: "/category-dcut.jpg",
+      image: "/D-cut bags.jpeg",
       href: "/products",
     },
     {
       title: "W-Cut Bags",
       description:
         "Strong everyday carry solution for grocery and wholesale usage.",
-      image: "/category-wcut.jpg",
+      image: "/w-cut bags.jpeg",
       href: "/products",
     },
     {
       title: "Loop Handle Bags",
       description:
         "Premium feel for fashion stores, boutiques and branded packaging.",
-      image: "/category-loop.jpg",
+      image: "/Loop handle.jpeg",
       href: "/products",
     },
   ];
@@ -278,7 +285,7 @@ export default function HomePage() {
           <div className="relative overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-zinc-100">
             <div className="relative aspect-[4/3]">
               <Image
-                src="/factory.jpg"
+                src="/factory.png"
                 alt="Bag manufacturing setup"
                 fill
                 className="object-cover"
