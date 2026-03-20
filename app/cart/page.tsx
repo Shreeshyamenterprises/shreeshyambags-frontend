@@ -4,8 +4,8 @@ import { AuthGuard } from "@/components/auth/auth-guard";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { getToken } from "@/lib/auth";
 import { CartResponse } from "@/types";
 import { useCartStore } from "@/store/cart-store";
 
@@ -22,30 +22,15 @@ function CartContent() {
     try {
       setLoading(true);
 
-      const token = getToken();
-      if (!token) {
-        setCart({ items: [], subtotal: 0 });
-        setCount(0);
-        return;
-      }
-
-      const res = await api.get("/cart", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await api.get("/cart");
 
       const data = res.data as CartResponse;
       setCart(data);
 
-      const count = (data.items ?? []).reduce(
-        (sum, item) => sum + item.quantity,
-        0,
-      );
-      setCount(count);
+      setCount((data.items ?? []).length);
     } catch (error) {
       console.error(error);
-      alert("Failed to load cart");
+      toast.error("Failed to load cart.");
     } finally {
       setLoading(false);
     }
@@ -53,18 +38,12 @@ function CartContent() {
 
   async function removeItem(id: string) {
     try {
-      const token = getToken();
-
-      await api.delete(`/cart/items/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await api.delete(`/cart/items/${id}`);
 
       await loadCart();
     } catch (error) {
       console.error(error);
-      alert("Failed to remove item");
+      toast.error("Failed to remove item.");
     }
   }
 
@@ -112,6 +91,8 @@ function CartContent() {
               {items.map((item) => {
                 const imageUrl = item.variant?.product?.images?.[0]?.url;
                 const title = item.variant?.product?.title || "Non-Woven Bag";
+                const slug = item.variant?.product?.slug;
+                const href = slug ? `/products/${slug}` : "#";
 
                 return (
                   <div
@@ -119,7 +100,7 @@ function CartContent() {
                     className="rounded-[2rem] bg-white p-5 shadow-sm ring-1 ring-zinc-100"
                   >
                     <div className="flex flex-col gap-4 md:flex-row">
-                      <div className="relative h-28 w-28 overflow-hidden rounded-2xl bg-zinc-100">
+                      <Link href={href} className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 transition hover:opacity-90">
                         {imageUrl ? (
                           <Image
                             src={imageUrl}
@@ -132,10 +113,12 @@ function CartContent() {
                             No Image
                           </div>
                         )}
-                      </div>
+                      </Link>
 
                       <div className="flex-1">
-                        <h2 className="text-lg font-semibold">{title}</h2>
+                        <Link href={href} className="hover:text-pink-600 transition">
+                          <h2 className="text-lg font-semibold">{title}</h2>
+                        </Link>
 
                         <p className="mt-1 text-sm text-zinc-600">
                           {item.variant?.size || "-"} /{" "}
@@ -157,11 +140,11 @@ function CartContent() {
                         )}
 
                         <p className="mt-3 font-medium">
-                          ₹
-                          {(
-                            ((item.variant?.price ?? 0) * item.quantity) /
-                            100
-                          ).toFixed(2)}
+                          ₹{
+                            item.variant?.pricePerKg != null
+                              ? (item.variant.pricePerKg * item.quantity).toFixed(2)
+                              : (((item.variant?.price ?? 0) * item.quantity) / 100).toFixed(2)
+                          }
                         </p>
                       </div>
 
@@ -189,14 +172,19 @@ function CartContent() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-zinc-600">Shipping</span>
-                  <span>₹0.00</span>
+                  <span className="text-zinc-600">
+                    Shipping
+                    {(cart?.totalKg ?? 0) > 0 && (
+                      <span className="ml-1 text-xs text-zinc-400">({cart!.totalKg} kg × ₹8)</span>
+                    )}
+                  </span>
+                  <span>₹{((cart?.shipping ?? 0) / 100).toFixed(2)}</span>
                 </div>
 
                 <div className="border-t border-zinc-200 pt-3 text-base font-semibold">
                   <div className="flex items-center justify-between">
                     <span>Total</span>
-                    <span>₹{((cart?.subtotal ?? 0) / 100).toFixed(2)}</span>
+                    <span>₹{((cart?.total ?? 0) / 100).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

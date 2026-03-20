@@ -1,5 +1,7 @@
-export type ProductImage = {
-  url: string;
+export type PricingTier = {
+  id?: string;
+  minQtyKg: number;
+  pricePerKg: number;
 };
 
 export type Variant = {
@@ -10,12 +12,20 @@ export type Variant = {
   price: number;
   stock: number;
   sku?: string | null;
+  isActive?: boolean;
+  gsm?: number | null;
+  pricePerKg?: number | null;
+  pricingTiers?: PricingTier[];
   product?: {
     id: string;
     title: string;
     slug: string;
-    images?: ProductImage[];
+    images?: { id?: string; url: string }[];
   };
+};
+
+export type ProductImage = {
+  url: string;
 };
 
 export type Product = {
@@ -60,4 +70,7 @@ export type CartItem = {
 export type CartResponse = {
   items: CartItem[];
   subtotal: number;
+  shipping: number;
+  totalKg: number;
+  total: number;
 };
