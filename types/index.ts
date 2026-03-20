@@ -70,4 +70,7 @@ export type CartItem = {
 export type CartResponse = {
   items: CartItem[];
   subtotal: number;
+  shipping: number;
+  totalKg: number;
+  total: number;
 };

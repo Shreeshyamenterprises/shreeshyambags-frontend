@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { Variant } from "@/types";
 
@@ -47,7 +48,7 @@ export function BulkQuoteForm({
         message: message || undefined,
       });
 
-      alert("Quote request sent successfully");
+      toast.success("Quote request sent successfully!");
 
       setName("");
       setPhone("");
@@ -58,7 +59,7 @@ export function BulkQuoteForm({
       setSelectedVariantId(variants[0]?.id ?? "");
     } catch (error: any) {
       console.error(error);
-      alert(error?.response?.data?.message || "Failed to send quote request");
+      toast.error(error?.response?.data?.message || "Failed to send quote request.");
     } finally {
       setLoading(false);
     }

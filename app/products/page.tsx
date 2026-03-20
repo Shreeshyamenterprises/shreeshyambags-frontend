@@ -1,438 +1,339 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { Search, SlidersHorizontal, X, ShoppingBag } from "lucide-react";
 import { api } from "@/lib/api";
 import { ProductCard } from "@/components/products/product-card";
 import { Product } from "@/types";
+import { toast } from "sonner";
 
-function FilterSelect({
+const SIZE_OPTIONS  = ["Small", "Medium", "Large", "Extra Large"];
+const COLOR_OPTIONS = ["Mint", "Grey Shade", "White", "Black", "Pink", "Blue", "Red"];
+const SHAPE_OPTIONS = ["D-Cut", "W-Cut", "Loop Handle", "Rectangle"];
+
+function FilterChip({
   label,
-  value,
-  onChange,
-  options,
+  active,
+  onClick,
 }: {
   label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: string[];
+  active: boolean;
+  onClick: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    function updatePosition() {
-      if (!buttonRef.current) return;
-
-      const rect = buttonRef.current.getBoundingClientRect();
-
-      setPosition({
-        top: rect.bottom + 8,
-        left: rect.left,
-        width: rect.width,
-      });
-    }
-
-    function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
-
-      if (
-        buttonRef.current &&
-        !buttonRef.current.contains(target) &&
-        menuRef.current &&
-        !menuRef.current.contains(target)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    if (open) {
-      updatePosition();
-      window.addEventListener("resize", updatePosition);
-      window.addEventListener("scroll", updatePosition, true);
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [open]);
-
   return (
-    <div className="rounded-[1.25rem] border border-zinc-200 bg-white p-2 shadow-sm transition hover:shadow-md">
-      <label className="mb-1 block px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
-        {label}
-      </label>
-
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between rounded-[0.95rem] bg-zinc-50 px-4 py-2.5 text-left text-sm font-medium text-zinc-800 transition hover:bg-zinc-100"
-      >
-        <span>{value || `All ${label}`}</span>
-
-        <svg
-          className={`h-4 w-4 text-zinc-400 transition ${
-            open ? "rotate-180" : ""
-          }`}
-          viewBox="0 0 20 20"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M5 7.5L10 12.5L15 7.5"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
-
-      {mounted && open
-        ? createPortal(
-            <div
-              ref={menuRef}
-              className="fixed z-[9999] max-h-[200px] overflow-y-auto rounded-[1rem] border border-zinc-200 bg-white shadow-[0_18px_50px_rgba(0,0,0,0.12)]"
-              style={{
-                top: position.top,
-                left: position.left,
-                width: position.width,
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => {
-                  onChange("");
-                  setOpen(false);
-                }}
-                className={`flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] transition ${
-                  value === ""
-                    ? "bg-pink-50 font-semibold text-pink-600"
-                    : "text-zinc-700 hover:bg-zinc-50"
-                }`}
-              >
-                {value === "" ? <span>✓</span> : <span className="w-[12px]" />}
-                All {label}
-              </button>
-
-              {options.map((option) => {
-                const selected = value === option;
-
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => {
-                      onChange(option);
-                      setOpen(false);
-                    }}
-                    className={`flex w-full items-center gap-2 px-4 py-3 text-left text-sm transition ${
-                      selected
-                        ? "bg-pink-50 font-semibold text-pink-600"
-                        : "text-zinc-700 hover:bg-zinc-50"
-                    }`}
-                  >
-                    {selected ? <span>✓</span> : <span className="w-[12px]" />}
-                    {option}
-                  </button>
-                );
-              })}
-            </div>,
-            document.body,
-          )
-        : null}
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition duration-200 ${
+        active
+          ? "border-pink-500 bg-pink-500 text-white shadow-sm"
+          : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 
-function StatPill({ title, value }: { title: string; value: string }) {
+function ProductSkeleton() {
   return (
-    <div className="rounded-full bg-white/80 px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200/80 backdrop-blur">
-      <span className="text-zinc-500">{title}: </span>
-      <span className="font-semibold text-zinc-900">{value}</span>
+    <div className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-zinc-100">
+      <div className="aspect-[4/3.5] animate-pulse bg-zinc-100" />
+      <div className="space-y-3 p-5">
+        <div className="flex gap-2">
+          <div className="h-5 w-14 animate-pulse rounded-full bg-zinc-100" />
+          <div className="h-5 w-16 animate-pulse rounded-full bg-zinc-100" />
+        </div>
+        <div className="h-5 w-3/4 animate-pulse rounded-lg bg-zinc-100" />
+        <div className="h-4 w-full animate-pulse rounded-lg bg-zinc-100" />
+        <div className="h-4 w-5/6 animate-pulse rounded-lg bg-zinc-100" />
+        <div className="flex items-center justify-between border-t border-zinc-50 pt-4">
+          <div className="h-7 w-20 animate-pulse rounded-lg bg-zinc-100" />
+          <div className="h-9 w-24 animate-pulse rounded-xl bg-zinc-100" />
+        </div>
+      </div>
     </div>
   );
 }
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts]       = useState<Product[]>([]);
+  const [loading, setLoading]         = useState(true);
+  const [search, setSearch]           = useState("");
+  const [size, setSize]               = useState("");
+  const [color, setColor]             = useState("");
+  const [shape, setShape]             = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const [search, setSearch] = useState("");
-  const [size, setSize] = useState("");
-  const [color, setColor] = useState("");
-  const [shape, setShape] = useState("");
-
+  // Debounce search so API is called 400ms after the user stops typing
   useEffect(() => {
-    loadProducts();
+    const timer = setTimeout(() => { loadProducts(); }, search ? 400 : 0);
+    return () => clearTimeout(timer);
   }, [search, size, color, shape]);
 
   async function loadProducts() {
     try {
       setLoading(true);
-
       const params = new URLSearchParams();
-
       if (search) params.set("search", search);
-      if (size) params.set("size", size);
-      if (color) params.set("color", color);
-      if (shape) params.set("shape", shape);
-
+      if (size)   params.set("size", size);
+      if (color)  params.set("color", color);
+      if (shape)  params.set("shape", shape);
       const res = await api.get(`/products?${params.toString()}`);
       setProducts(res.data.items ?? res.data ?? []);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to load products");
+    } catch {
+      toast.error("Failed to load products.");
     } finally {
       setLoading(false);
     }
   }
 
   function clearFilters() {
-    setSearch("");
-    setSize("");
-    setColor("");
-    setShape("");
+    setSearch(""); setSize(""); setColor(""); setShape("");
   }
 
-  const hasActiveFilters = useMemo(() => {
-    return Boolean(search || size || color || shape);
-  }, [search, size, color, shape]);
+  const hasFilters = useMemo(() => Boolean(search || size || color || shape), [search, size, color, shape]);
+
+  const activeCount = [size, color, shape].filter(Boolean).length;
 
   return (
-    <main className="min-h-screen bg-[#faf7fb]">
-      <section className="relative overflow-hidden border-b border-zinc-200/70 bg-gradient-to-br from-rose-50 via-pink-50 to-fuchsia-100">
-        <div className="absolute inset-0 opacity-[0.08]">
-          <Image
-            src="/banner-bags.png"
-            alt="Premium non woven bags"
-            fill
-            className="object-cover"
-            priority
-          />
+    <main className="min-h-screen bg-[#f7f7fb]">
+      {/* ── Hero ── */}
+      <section className="relative flex min-h-[320px] flex-col justify-center overflow-hidden border-b border-zinc-200/70 bg-gradient-to-br from-rose-50 via-pink-50 to-fuchsia-100">
+        {/* Background image */}
+        <div className="absolute inset-0 opacity-[0.07]">
+          <Image src="/banner-bags.png" alt="" fill className="object-cover" priority />
         </div>
 
+        {/* Ambient blobs */}
         <div className="absolute -left-16 top-10 h-72 w-72 rounded-full bg-pink-200/40 blur-3xl" />
         <div className="absolute -right-12 bottom-0 h-72 w-72 rounded-full bg-fuchsia-200/40 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-5">
-          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-            <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">
-                Our Collection
-              </p>
-              <h1 className="mt-3 text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl">
-                Find the perfect non woven bag for your business
-              </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-600 sm:text-lg">
-                Browse premium custom bags in different colors, sizes and
-                shapes. Designed for shops, brands, gifting and bulk orders with
-                strong pricing and reusable packaging value.
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <StatPill title="Bulk Orders" value="200 KG MOQ" />
-                <StatPill title="Customization" value="Logo Printing" />
-                <StatPill title="Pricing" value="Per KG" />
-              </div>
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:px-8 lg:py-16">
+          {/* Left: text */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-pink-500">
+              Our Collection
+            </p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl lg:text-5xl">
+              Premium Non-Woven Bags
+            </h1>
+            <p className="mt-4 text-sm leading-7 text-zinc-600 sm:text-base">
+              Custom bags in different colors, sizes and shapes — designed for shops, brands and bulk orders with strong per-kg pricing.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              {[
+                { label: "MOQ", value: "200 KG" },
+                { label: "Pricing", value: "Per KG" },
+                { label: "Custom", value: "Logo Printing" },
+              ].map(({ label, value }) => (
+                <div key={label} className="rounded-full bg-white/90 px-4 py-2 text-xs font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200">
+                  <span className="text-zinc-400">{label}: </span>{value}
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* <div className="hidden lg:block">
-              <div className="relative ml-auto aspect-[5/4] w-full max-w-xl overflow-hidden rounded-[2.25rem] bg-white/70 shadow-[0_20px_80px_rgba(0,0,0,0.10)] ring-1 ring-white/60 backdrop-blur">
-                <Image
-                  src="/banner.png"
-                  alt="Non woven bags collection"
-                  fill
-                  className="object-cover"
-                />
+          {/* Right: product spec cards */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { value: "50+",      label: "Bag Variants" },
+              { value: "200 KG",   label: "Min. Order Qty" },
+              { value: "7 Colors", label: "Available Colors" },
+              { value: "4 Shapes", label: "Bag Styles" },
+            ].map(({ value, label }) => (
+              <div key={label} className="rounded-2xl bg-white/80 px-5 py-4 shadow-sm ring-1 ring-zinc-200/60 backdrop-blur-sm">
+                <p className="text-2xl font-bold text-zinc-900">{value}</p>
+                <p className="mt-0.5 text-xs font-medium text-zinc-500">{label}</p>
               </div>
-            </div> */}
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="relative z-20 mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="rounded-[1.5rem] bg-white/90 p-4 shadow-sm ring-1 ring-zinc-100 backdrop-blur">
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-pink-500">
-                  Filter Products
-                </p>
-                <h2 className="mt-2 text-2xl font-bold text-zinc-900">
-                  Explore by size, color and bag shape
-                </h2>
-                <p className="mt-2 text-sm text-zinc-600">
-                  Use the search and smart filters to quickly find the right bag
-                  style.
-                </p>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {/* ── Search + Filter bar ── */}
+        <div className="sticky top-[73px] z-30 -mx-4 bg-[#f7f7fb]/95 px-4 py-4 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+
+          {/* Main bar */}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200">
+            <div className="flex items-center divide-x divide-zinc-100">
+
+              {/* Search input */}
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search bags, styles, colors…"
+                  className="w-full bg-transparent py-4 pl-11 pr-10 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-full bg-zinc-50 px-4 py-2 text-sm text-zinc-600 ring-1 ring-zinc-200">
-                  Showing{" "}
-                  <span className="font-semibold text-zinc-900">
-                    {products.length}
-                  </span>{" "}
-                  products
-                </div>
+              {/* Filter toggle button */}
+              <button
+                onClick={() => setFiltersOpen(p => !p)}
+                className={`flex shrink-0 items-center gap-2 px-5 py-4 text-sm font-semibold transition ${
+                  filtersOpen || activeCount > 0
+                    ? "bg-pink-500 text-white"
+                    : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                }`}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+                {activeCount > 0 && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-pink-600">
+                    {activeCount}
+                  </span>
+                )}
+              </button>
 
-                <button
-                  onClick={clearFilters}
-                  className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50"
-                  disabled={!hasActiveFilters}
-                >
-                  Clear Filters
-                </button>
+              {/* Product count */}
+              <div className="hidden shrink-0 items-center gap-1.5 px-5 py-4 sm:flex">
+                <span className="text-lg font-bold text-zinc-900">{products.length}</span>
+                <span className="text-sm text-zinc-400">products</span>
               </div>
             </div>
 
-            <div className="relative z-30 grid gap-3 overflow-visible xl:grid-cols-[1.45fr_1fr_1fr_1fr]">
-              <div className="rounded-[1.25rem] border border-zinc-200 bg-white p-2 shadow-sm transition hover:shadow-md">
-                <label className="mb-2 block px-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
-                  Search
-                </label>
+            {/* Expanded filter panel — inside the card */}
+            {filtersOpen && (
+              <div className="border-t border-zinc-100 bg-zinc-50/60 px-5 py-5">
+                <div className="grid gap-5 sm:grid-cols-3">
+                  {/* Size */}
+                  <div>
+                    <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                      <span className="h-px flex-1 bg-zinc-200" /> Size <span className="h-px flex-1 bg-zinc-200" />
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {SIZE_OPTIONS.map(o => (
+                        <FilterChip key={o} label={o} active={size === o} onClick={() => setSize(size === o ? "" : o)} />
+                      ))}
+                    </div>
+                  </div>
 
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search bags, categories, styles..."
-                    className="w-full rounded-[1rem] border border-transparent bg-zinc-50 px-4 py-3 pl-11 text-sm font-medium text-zinc-800 outline-none transition focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-zinc-400">
-                    🔍
-                  </span>
-                </div>
-              </div>
+                  {/* Color */}
+                  <div>
+                    <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                      <span className="h-px flex-1 bg-zinc-200" /> Color <span className="h-px flex-1 bg-zinc-200" />
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {COLOR_OPTIONS.map(o => (
+                        <FilterChip key={o} label={o} active={color === o} onClick={() => setColor(color === o ? "" : o)} />
+                      ))}
+                    </div>
+                  </div>
 
-              <FilterSelect
-                label="Size"
-                value={size}
-                onChange={setSize}
-                options={["Small", "Medium", "Large", "Extra Large"]}
-              />
-
-              <FilterSelect
-                label="Color"
-                value={color}
-                onChange={setColor}
-                options={[
-                  "Mint",
-                  "Grey Shade",
-                  "White",
-                  "Black",
-                  "Pink",
-                  "Blue",
-                  "Red",
-                ]}
-              />
-
-              <FilterSelect
-                label="Shape"
-                value={shape}
-                onChange={setShape}
-                options={["D-Cut", "W-Cut", "Loop Handle", "Rectangle"]}
-              />
-            </div>
-
-            {hasActiveFilters ? (
-              <div className="flex flex-wrap gap-2">
-                {search ? (
-                  <span className="rounded-full bg-pink-50 px-3 py-2 text-xs font-semibold text-pink-600 ring-1 ring-pink-100">
-                    Search: {search}
-                  </span>
-                ) : null}
-                {size ? (
-                  <span className="rounded-full bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200">
-                    Size: {size}
-                  </span>
-                ) : null}
-                {color ? (
-                  <span className="rounded-full bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200">
-                    Color: {color}
-                  </span>
-                ) : null}
-                {shape ? (
-                  <span className="rounded-full bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200">
-                    Shape: {shape}
-                  </span>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="mt-10">
-          {loading ? (
-            <div className="relative z-0 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {[1, 2, 3, 4, 5, 6].map((item) => (
-                <div className="relative z-30 overflow-visible rounded-[1.5rem] bg-white/90 p-4 shadow-sm ring-1 ring-zinc-100 backdrop-blur">
-                  <div className="aspect-[4/4.5] animate-pulse rounded-[1.5rem] bg-zinc-200" />
-                  <div className="mt-5 space-y-3">
-                    <div className="h-6 w-2/3 animate-pulse rounded bg-zinc-200" />
-                    <div className="h-4 w-full animate-pulse rounded bg-zinc-200" />
-                    <div className="h-4 w-5/6 animate-pulse rounded bg-zinc-200" />
-                    <div className="h-8 w-1/3 animate-pulse rounded bg-zinc-200" />
+                  {/* Shape */}
+                  <div>
+                    <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                      <span className="h-px flex-1 bg-zinc-200" /> Shape <span className="h-px flex-1 bg-zinc-200" />
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {SHAPE_OPTIONS.map(o => (
+                        <FilterChip key={o} label={o} active={shape === o} onClick={() => setShape(shape === o ? "" : o)} />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
+
+                {hasFilters && (
+                  <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-4">
+                    <p className="text-xs text-zinc-400">{activeCount} filter{activeCount !== 1 ? "s" : ""} active</p>
+                    <button
+                      onClick={clearFilters}
+                      className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-pink-600 transition hover:bg-pink-50"
+                    >
+                      <X className="h-3.5 w-3.5" /> Clear all
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Active filter pills (shown when filter panel is closed) */}
+          {hasFilters && !filtersOpen && (
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-zinc-400">Active:</span>
+              {search && (
+                <span className="flex items-center gap-1.5 rounded-full bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-600 ring-1 ring-pink-100">
+                  &ldquo;{search}&rdquo;
+                  <button onClick={() => setSearch("")} className="rounded-full hover:bg-pink-100"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {size && (
+                <span className="flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 ring-1 ring-blue-100">
+                  Size: {size} <button onClick={() => setSize("")} className="rounded-full hover:bg-blue-100"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {color && (
+                <span className="flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-600 ring-1 ring-purple-100">
+                  Color: {color} <button onClick={() => setColor("")} className="rounded-full hover:bg-purple-100"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {shape && (
+                <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-100">
+                  Shape: {shape} <button onClick={() => setShape("")} className="rounded-full hover:bg-emerald-100"><X className="h-3 w-3" /></button>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── Product grid ── */}
+        <div className="pb-16 pt-2">
+          {loading ? (
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {[1,2,3,4,5,6].map(i => <ProductSkeleton key={i} />)}
             </div>
           ) : products.length === 0 ? (
-            <div className="rounded-[2rem] bg-white p-10 text-center shadow-sm ring-1 ring-zinc-100">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-pink-50 text-2xl">
-                👜
+            <div className="flex flex-col items-center justify-center gap-4 rounded-3xl bg-white py-20 text-center shadow-sm ring-1 ring-zinc-100">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-50">
+                <ShoppingBag className="h-8 w-8 text-zinc-300" />
               </div>
-              <h2 className="mt-5 text-2xl font-semibold text-zinc-900">
-                No products found
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-zinc-600">
-                Try changing your search or filter options to explore more bag
-                styles.
-              </p>
+              <div>
+                <h2 className="text-xl font-bold text-zinc-900">No products found</h2>
+                <p className="mt-2 text-sm text-zinc-500">Try changing your search or filters to find the right bag.</p>
+              </div>
               <button
                 onClick={clearFilters}
-                className="mt-6 rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
+                className="rounded-xl bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700"
               >
-                Reset Filters
+                Clear Filters
               </button>
             </div>
           ) : (
             <>
-              <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-5 flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-zinc-900">
-                    Premium bag collection
-                  </h3>
-                  <p className="mt-1 text-sm text-zinc-600">
-                    Select from reusable, customizable and business-ready bag
-                    options.
+                  <h2 className="text-xl font-bold text-zinc-900">
+                    {hasFilters ? "Filtered Results" : "All Products"}
+                  </h2>
+                  <p className="mt-0.5 text-sm text-zinc-500">
+                    {products.length} product{products.length !== 1 ? "s" : ""} available
                   </p>
                 </div>
               </div>
-
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {products.map((product) => (
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {products.map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             </>
           )}
         </div>
-      </section>
+      </div>
     </main>
   );
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ShoppingCart, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Variant } from "@/types";
+import { api } from "@/lib/api";
+import { getToken } from "@/lib/auth";
+import { useCartStore } from "@/store/cart-store";
 
 function parseSize(size: string) {
   const numbers = size.match(/\d+/g);
@@ -78,6 +84,10 @@ export function PremiumQuotePanel({
   const [qtyKg, setQtyKg] = useState<number>(200);
   const [printColors, setPrintColors] = useState<number>(1);
   const [customText, setCustomText] = useState("");
+  const [addingToCart, setAddingToCart] = useState(false);
+  const router = useRouter();
+  const setCartCount = useCartStore((s) => s.setCount);
+  const cartCount = useCartStore((s) => s.count);
 
   const selectedVariant = useMemo(
     () => variants.find((v) => v.id === selectedId) ?? variants[0] ?? null,
@@ -172,6 +182,28 @@ Estimated Total: ₹${totalCost}`
   const whatsappUrl = `https://wa.me/919389517814?text=${encodeURIComponent(
     whatsappMessage,
   )}`;
+
+  async function handleAddToCart() {
+    if (!selectedVariant) return;
+    if (!getToken()) {
+      router.push("/login");
+      return;
+    }
+    try {
+      setAddingToCart(true);
+      await api.post("/cart/items", {
+        variantId: selectedVariant.id,
+        customText: customText || undefined,
+        quantity: qtyKg,
+      });
+      setCartCount(cartCount + 1);
+      toast.success("Added to cart!");
+    } catch {
+      toast.error("Failed to add to cart. Please try again.");
+    } finally {
+      setAddingToCart(false);
+    }
+  }
 
   if (!selectedVariant) {
     return (
@@ -416,6 +448,20 @@ Estimated Total: ₹${totalCost}`
             </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          disabled={addingToCart}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {addingToCart ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ShoppingCart className="h-4 w-4" />
+          )}
+          {addingToCart ? "Adding…" : "Add to Cart"}
+        </button>
 
         <a
           href={whatsappUrl}

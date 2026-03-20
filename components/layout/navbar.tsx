@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Menu, ShoppingBag, X } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cart-store";
 import { useAuthStore } from "@/store/auth-store";
+import { api } from "@/lib/api";
 
 function NavLink({
   href,
@@ -74,29 +75,45 @@ function MobileNavLink({
 
 export function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const count = useCartStore((s) => s.count);
+  const count    = useCartStore((s) => s.count);
+  const setCount = useCartStore((s) => s.setCount);
 
   const loggedIn = useAuthStore((s) => s.loggedIn);
-  const load = useAuthStore((s) => s.load);
-  const logout = useAuthStore((s) => s.logout);
-
+  const token    = useAuthStore((s) => s.token);
+  const load     = useAuthStore((s) => s.load);
   const [open, setOpen] = useState(false);
+
+  // Decode role from JWT payload without a library
+  const isAdmin = (() => {
+    try {
+      if (!token) return false;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload?.role === "ADMIN";
+    } catch {
+      return false;
+    }
+  })();
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const hideNavbar = pathname === "/login" || pathname === "/signup";
+  // Sync cart count on app load once auth is resolved
+  useEffect(() => {
+    if (!loggedIn) return;
+    api.get("/cart")
+      .then((res) => setCount((res.data?.items ?? []).length))
+      .catch(() => {});
+  }, [loggedIn, setCount]);
+
+  const hideNavbar =
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password";
 
   if (hideNavbar) {
     return null;
-  }
-
-  function handleLogout() {
-    logout();
-    setOpen(false);
-    router.replace("/login");
   }
 
   function closeMenu() {
@@ -149,18 +166,17 @@ export function Navbar() {
         <div className="hidden items-center gap-2 lg:flex">
           {loggedIn ? (
             <>
+              {isAdmin && (
+                <NavLink href="/admin" pathname={pathname}>
+                  Admin
+                </NavLink>
+              )}
               <NavLink href="/dashboard" pathname={pathname}>
                 Account
               </NavLink>
               <NavLink href="/orders" pathname={pathname}>
                 My Orders
               </NavLink>
-              <button
-                onClick={handleLogout}
-                className="rounded-full px-3 py-2 text-sm font-medium text-zinc-700 transition duration-300 hover:bg-zinc-50 hover:text-pink-500"
-              >
-                Logout
-              </button>
             </>
           ) : (
             <>
@@ -278,6 +294,11 @@ export function Navbar() {
 
             {loggedIn ? (
               <>
+                {isAdmin && (
+                  <MobileNavLink href="/admin" pathname={pathname} onClick={closeMenu}>
+                    Admin Panel
+                  </MobileNavLink>
+                )}
                 <MobileNavLink
                   href="/dashboard"
                   pathname={pathname}
@@ -292,12 +313,6 @@ export function Navbar() {
                 >
                   My Orders
                 </MobileNavLink>
-                <button
-                  onClick={handleLogout}
-                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-zinc-700 transition duration-300 hover:bg-zinc-50 hover:text-pink-500"
-                >
-                  Logout
-                </button>
               </>
             ) : (
               <>
