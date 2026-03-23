@@ -182,7 +182,7 @@ export default function SignupPage() {
             <div className="relative hidden overflow-hidden lg:block">
               <Image
                 src="/signup-collage.png"
-                alt="Shree Shyam Bags products"
+                alt="PieBags products"
                 fill
                 priority
                 className="object-cover"
@@ -195,7 +195,7 @@ export default function SignupPage() {
                   <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-pink-200">
-                      Shree Shyam Bags
+                      PieBags
                     </span>
                   </div>
 
@@ -249,7 +249,7 @@ export default function SignupPage() {
                 <div className="relative h-9 w-9 overflow-hidden rounded-xl bg-white ring-1 ring-zinc-200">
                   <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
                 </div>
-                <span className="text-sm font-bold tracking-tight text-zinc-800">Shree Shyam Bags</span>
+                <span className="text-sm font-bold tracking-tight text-zinc-800">PieBags</span>
               </div>
 
               {/* Heading */}
@@ -258,7 +258,7 @@ export default function SignupPage() {
                   Create Account
                 </span>
                 <h1 className="mt-2 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl">
-                  Join Shree Shyam Bags
+                  Join PieBags
                 </h1>
                 <p className="mt-1 text-sm text-zinc-500">
                   Sign up free — no credit card required.
