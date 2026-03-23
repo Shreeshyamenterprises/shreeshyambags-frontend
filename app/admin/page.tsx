@@ -154,7 +154,7 @@ export default function AdminPage() {
 
   const whatsappUrl = (lead: Lead) =>
     `https://wa.me/91${lead.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-      `Hello ${lead.name}, we received your enquiry from Shree Shyam Bags. How can we help you?`
+      `Hello ${lead.name}, we received your enquiry from PieBags. How can we help you?`
     )}`;
 
   return (
