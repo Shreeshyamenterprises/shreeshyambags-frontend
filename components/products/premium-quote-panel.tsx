@@ -189,17 +189,25 @@ Estimated Total: ₹${totalCost}`
       router.push("/login");
       return;
     }
+    const qty = Math.floor(qtyKg);
+    if (!qty || qty < 1) {
+      toast.error("Please enter a valid quantity (minimum 1 KG).");
+      return;
+    }
     try {
       setAddingToCart(true);
       await api.post("/cart/items", {
         variantId: selectedVariant.id,
         customText: customText || undefined,
-        quantity: qtyKg,
+        quantity: qty,
       });
       setCartCount(cartCount + 1);
       toast.success("Added to cart!");
-    } catch {
-      toast.error("Failed to add to cart. Please try again.");
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? "Failed to add to cart. Please try again.";
+      toast.error(Array.isArray(message) ? message[0] : message);
     } finally {
       setAddingToCart(false);
     }
