@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setToken } from "@/lib/auth";
 
-export default function GoogleSuccessPage() {
+function GoogleSuccessInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -25,5 +25,13 @@ export default function GoogleSuccessPage() {
         Signing you in with Google...
       </div>
     </main>
+  );
+}
+
+export default function GoogleSuccessPage() {
+  return (
+    <Suspense>
+      <GoogleSuccessInner />
+    </Suspense>
   );
 }

@@ -140,7 +140,7 @@ export function Navbar() {
 
           <div className="leading-tight">
             <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-pink-500 sm:text-xs">
-              Premium Non-Woven Bags
+              Premium Bag Manufacturer
             </p>
             <h1 className="text-base font-bold tracking-tight text-zinc-900 transition duration-300 group-hover:text-pink-600 sm:text-lg lg:text-xl">
               PieBags

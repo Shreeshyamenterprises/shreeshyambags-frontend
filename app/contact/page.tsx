@@ -40,13 +40,13 @@ const contactDetails = [
   {
     icon: <Mail className="h-5 w-5 text-blue-500" />,
     label: "Email",
-    value: "shreeshyamenterprise@gmail.com",
-    href: "mailto:shreeshyamenterprise@gmail.com",
+    value: "hello@piebags.in",
+    href: "mailto:hello@piebags.in",
   },
   {
     icon: <MapPin className="h-5 w-5 text-red-400" />,
     label: "Location",
-    value: "Kanpur, Uttar Pradesh, India",
+    value: "Roorkee, Uttarakhand, India",
     href: null,
   },
   {
@@ -118,9 +118,9 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 gap-3">
             {[
               { icon: <Phone className="h-4 w-4 text-pink-500" />, label: "Phone / WhatsApp", value: "+91 93895 17814" },
-              { icon: <Mail className="h-4 w-4 text-blue-500" />,  label: "Email", value: "shreeshyambags@gmail.com" },
+              { icon: <Mail className="h-4 w-4 text-blue-500" />,  label: "Email", value: "hello@piebags.in" },
               { icon: <Clock className="h-4 w-4 text-emerald-500" />, label: "Response Time", value: "Same day reply" },
-              { icon: <MapPin className="h-4 w-4 text-orange-500" />, label: "Location", value: "Kanpur, Uttar Pradesh" },
+              { icon: <MapPin className="h-4 w-4 text-orange-500" />, label: "Location", value: "Roorkee, Uttarakhand" },
             ].map(({ icon, label, value }) => (
               <div key={label} className="flex items-center gap-3 rounded-2xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-zinc-200/60 backdrop-blur-sm">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-50 ring-1 ring-zinc-100">
