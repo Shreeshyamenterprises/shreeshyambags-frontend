@@ -78,7 +78,7 @@ export default function HomePage() {
             {/* Badge */}
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-sm ring-1 ring-pink-100">
               <span className="flex h-2 w-2 rounded-full bg-green-500" />
-              <span className="text-xs font-semibold text-zinc-700">Manufacturer · Kanpur, UP</span>
+              <span className="text-xs font-semibold text-zinc-700">Manufacturer · Roorkee, UK</span>
             </div>
 
             <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl lg:text-5xl">
@@ -320,7 +320,7 @@ export default function HomePage() {
                 <Image src="/factory.png" alt="Manufacturing unit" fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/40 to-transparent" />
                 <div className="absolute bottom-4 left-4 rounded-xl bg-white/90 px-4 py-2 backdrop-blur-sm">
-                  <p className="text-xs font-semibold text-zinc-700">In-House Manufacturing · Kanpur, UP</p>
+                  <p className="text-xs font-semibold text-zinc-700">In-House Manufacturing · Roorkee, UK</p>
                 </div>
               </div>
             </div>
@@ -328,7 +328,7 @@ export default function HomePage() {
               <SectionHeading
                 eyebrow="About Us"
                 title="Manufacturer You Can Trust for Repeat Business"
-                description="Shree Shyam Enterprises is a Kanpur-based non-woven bag manufacturer supplying retailers, grocery chains, boutiques, sweet shops and distributors across India."
+                description="PieBags is a Roorkee-based bag manufacturer supplying retailers, grocery chains, boutiques, sweet shops and distributors across India."
               />
               <div className="mt-8 space-y-4">
                 {[
@@ -448,7 +448,7 @@ export default function HomePage() {
                   <CheckCircle2 className="h-4 w-4 text-green-400" /> Call us: <span className="font-semibold text-white">+91 93895 17814</span>
                 </p>
                 <p className="flex items-center gap-2 text-sm text-zinc-400">
-                  <CheckCircle2 className="h-4 w-4 text-green-400" /> Email: <span className="font-semibold text-white">shreeshyambags@gmail.com</span>
+                  <CheckCircle2 className="h-4 w-4 text-green-400" /> Email: <span className="font-semibold text-white">hello@piebags.in</span>
                 </p>
               </div>
             </div>

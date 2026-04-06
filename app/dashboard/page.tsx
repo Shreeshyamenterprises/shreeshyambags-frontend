@@ -509,7 +509,7 @@ function DashboardContent() {
                     { icon: <Mail className="h-4 w-4 text-zinc-400" />,     label: "Email",    value: user?.email },
                     { icon: <Phone className="h-4 w-4 text-zinc-400" />,    label: "Phone",    value: user?.phone ? `+91 ${user.phone}` : "Not added" },
                     { icon: <MapPin className="h-4 w-4 text-zinc-400" />,   label: "Location", value: "India" },
-                    { icon: <Star className="h-4 w-4 text-yellow-400" />,   label: "Member",   value: "Shree Shyam Customer" },
+                    { icon: <Star className="h-4 w-4 text-yellow-400" />,   label: "Member",   value: "PieBags Member" },
                   ].map(({ icon, label, value }) => (
                     <div key={label} className="flex items-center gap-3 py-3">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-50 ring-1 ring-zinc-100">
