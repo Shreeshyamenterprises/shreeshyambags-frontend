@@ -31,16 +31,20 @@ function InputField({
   label,
   value,
   onChange,
+  onBlur,
   placeholder,
   required = false,
   type = "text",
+  error,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  onBlur?: () => void;
   placeholder?: string;
   required?: boolean;
   type?: string;
+  error?: string;
 }) {
   return (
     <div>
@@ -51,12 +55,77 @@ function InputField({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
-        required={required}
-        className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+        className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 ${
+          error
+            ? "border-red-300 bg-red-50/40 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+            : "border-zinc-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+        }`}
       />
+      {error && (
+        <p className="mt-1 text-xs font-medium text-red-500">{error}</p>
+      )}
     </div>
   );
+}
+
+type FormErrors = {
+  shipName?: string;
+  shipPhone?: string;
+  shipAddressLine1?: string;
+  shipCity?: string;
+  shipState?: string;
+  shipPincode?: string;
+};
+
+function validate(fields: {
+  shipName: string;
+  shipPhone: string;
+  shipAddressLine1: string;
+  shipCity: string;
+  shipState: string;
+  shipPincode: string;
+}): FormErrors {
+  const errors: FormErrors = {};
+
+  if (!fields.shipName.trim()) {
+    errors.shipName = "Full name is required.";
+  } else if (fields.shipName.trim().length < 2) {
+    errors.shipName = "Name must be at least 2 characters.";
+  }
+
+  if (!fields.shipPhone.trim()) {
+    errors.shipPhone = "Phone number is required.";
+  } else if (!/^[6-9]\d{9}$/.test(fields.shipPhone.trim())) {
+    errors.shipPhone = "Enter a valid 10-digit Indian mobile number.";
+  }
+
+  if (!fields.shipAddressLine1.trim()) {
+    errors.shipAddressLine1 = "Address is required.";
+  } else if (fields.shipAddressLine1.trim().length < 5) {
+    errors.shipAddressLine1 = "Please enter a complete address.";
+  }
+
+  if (!fields.shipCity.trim()) {
+    errors.shipCity = "City is required.";
+  } else if (fields.shipCity.trim().length < 2) {
+    errors.shipCity = "Enter a valid city name.";
+  }
+
+  if (!fields.shipState.trim()) {
+    errors.shipState = "State is required.";
+  } else if (fields.shipState.trim().length < 2) {
+    errors.shipState = "Enter a valid state name.";
+  }
+
+  if (!fields.shipPincode.trim()) {
+    errors.shipPincode = "Pincode is required.";
+  } else if (!/^\d{6}$/.test(fields.shipPincode.trim())) {
+    errors.shipPincode = "Enter a valid 6-digit pincode.";
+  }
+
+  return errors;
 }
 
 function CheckoutContent() {
@@ -74,6 +143,8 @@ function CheckoutContent() {
   const [shipState, setShipState]             = useState("");
   const [shipPincode, setShipPincode]         = useState("");
   const [loading, setLoading]                 = useState(false);
+  const [errors, setErrors]                   = useState<FormErrors>({});
+  const [touched, setTouched]                 = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     api.get("/cart")
@@ -82,8 +153,26 @@ function CheckoutContent() {
       .finally(() => setCartLoading(false));
   }, []);
 
+  function touch(field: string) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const errs = validate({ shipName, shipPhone, shipAddressLine1, shipCity, shipState, shipPincode });
+    setErrors(errs);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const allTouched = { shipName: true, shipPhone: true, shipAddressLine1: true, shipCity: true, shipState: true, shipPincode: true };
+    setTouched(allTouched);
+
+    const errs = validate({ shipName, shipPhone, shipAddressLine1, shipCity, shipState, shipPincode });
+    setErrors(errs);
+
+    if (Object.keys(errs).length > 0) {
+      toast.error("Please fix the errors before placing your order.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -95,7 +184,6 @@ function CheckoutContent() {
 
       const { orderId, razorpayOrderId, amount, keyId } = res.data;
 
-      // If Razorpay is configured, open payment popup
       if (razorpayOrderId && keyId) {
         const loaded = await loadRazorpayScript();
         if (!loaded) {
@@ -109,7 +197,7 @@ function CheckoutContent() {
             amount,
             currency: "INR",
             order_id: razorpayOrderId,
-            name: "PieBags",
+            name: "Econest Packaging",
             description: "Non-Woven Bag Order",
             handler: async (response: any) => {
               try {
@@ -173,27 +261,81 @@ function CheckoutContent() {
         <div className="grid gap-6 lg:grid-cols-[1fr_340px] lg:items-start">
 
           {/* Shipping Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-100">
               <div className="border-b border-zinc-100 px-5 py-4">
                 <h2 className="text-sm font-bold text-zinc-900">Shipping Address</h2>
               </div>
               <div className="grid gap-4 p-5 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <InputField label="Full Name" value={shipName} onChange={setShipName} placeholder="Your full name" required />
+                  <InputField
+                    label="Full Name"
+                    value={shipName}
+                    onChange={(v) => { setShipName(v); if (touched.shipName) setErrors((p) => ({ ...p, shipName: v.trim().length < 2 ? "Name must be at least 2 characters." : undefined })); }}
+                    onBlur={() => touch("shipName")}
+                    placeholder="Your full name"
+                    required
+                    error={touched.shipName ? errors.shipName : undefined}
+                  />
                 </div>
                 <div className="sm:col-span-2">
-                  <InputField label="Phone Number" value={shipPhone} onChange={setShipPhone} placeholder="10-digit mobile number" type="tel" required />
+                  <InputField
+                    label="Phone Number"
+                    value={shipPhone}
+                    onChange={(v) => { setShipPhone(v); if (touched.shipPhone) setErrors((p) => ({ ...p, shipPhone: !/^[6-9]\d{9}$/.test(v.trim()) ? "Enter a valid 10-digit Indian mobile number." : undefined })); }}
+                    onBlur={() => touch("shipPhone")}
+                    placeholder="10-digit mobile number"
+                    type="tel"
+                    required
+                    error={touched.shipPhone ? errors.shipPhone : undefined}
+                  />
                 </div>
                 <div className="sm:col-span-2">
-                  <InputField label="Address Line 1" value={shipAddressLine1} onChange={setShipAddressLine1} placeholder="Street, building, area" required />
+                  <InputField
+                    label="Address Line 1"
+                    value={shipAddressLine1}
+                    onChange={(v) => { setShipAddressLine1(v); if (touched.shipAddressLine1) setErrors((p) => ({ ...p, shipAddressLine1: v.trim().length < 5 ? "Please enter a complete address." : undefined })); }}
+                    onBlur={() => touch("shipAddressLine1")}
+                    placeholder="Street, building, area"
+                    required
+                    error={touched.shipAddressLine1 ? errors.shipAddressLine1 : undefined}
+                  />
                 </div>
                 <div className="sm:col-span-2">
-                  <InputField label="Address Line 2" value={shipAddressLine2} onChange={setShipAddressLine2} placeholder="Landmark, floor, suite (optional)" />
+                  <InputField
+                    label="Address Line 2"
+                    value={shipAddressLine2}
+                    onChange={setShipAddressLine2}
+                    placeholder="Landmark, floor, suite (optional)"
+                  />
                 </div>
-                <InputField label="City" value={shipCity} onChange={setShipCity} placeholder="City" required />
-                <InputField label="State" value={shipState} onChange={setShipState} placeholder="State" required />
-                <InputField label="Pincode" value={shipPincode} onChange={setShipPincode} placeholder="6-digit pincode" required />
+                <InputField
+                  label="City"
+                  value={shipCity}
+                  onChange={(v) => { setShipCity(v); if (touched.shipCity) setErrors((p) => ({ ...p, shipCity: v.trim().length < 2 ? "Enter a valid city name." : undefined })); }}
+                  onBlur={() => touch("shipCity")}
+                  placeholder="City"
+                  required
+                  error={touched.shipCity ? errors.shipCity : undefined}
+                />
+                <InputField
+                  label="State"
+                  value={shipState}
+                  onChange={(v) => { setShipState(v); if (touched.shipState) setErrors((p) => ({ ...p, shipState: v.trim().length < 2 ? "Enter a valid state name." : undefined })); }}
+                  onBlur={() => touch("shipState")}
+                  placeholder="State"
+                  required
+                  error={touched.shipState ? errors.shipState : undefined}
+                />
+                <InputField
+                  label="Pincode"
+                  value={shipPincode}
+                  onChange={(v) => { setShipPincode(v); if (touched.shipPincode) setErrors((p) => ({ ...p, shipPincode: !/^\d{6}$/.test(v.trim()) ? "Enter a valid 6-digit pincode." : undefined })); }}
+                  onBlur={() => touch("shipPincode")}
+                  placeholder="6-digit pincode"
+                  required
+                  error={touched.shipPincode ? errors.shipPincode : undefined}
+                />
               </div>
             </div>
 

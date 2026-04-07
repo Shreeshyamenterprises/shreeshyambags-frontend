@@ -1,7 +1,7 @@
 "use client";
 
 import { AuthGuard } from "@/components/auth/auth-guard";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -13,6 +13,10 @@ function CartContent() {
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const setCount = useCartStore((s) => s.setCount);
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     loadCart();

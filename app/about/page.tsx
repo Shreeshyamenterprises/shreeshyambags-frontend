@@ -83,7 +83,7 @@ export default function AboutPage() {
           {/* Left: text */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-pink-500">
-              About PieBags
+              About Econest Packaging
             </p>
             <h1 className="mt-3 text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl">
               Bags Built for Businesses, Brands &amp; Bulk Orders
@@ -166,7 +166,7 @@ export default function AboutPage() {
               A decade of making bags that work for business
             </h2>
             <p className="mt-5 text-base leading-7 text-zinc-600">
-              PieBags started with a single belief — that packaging should do two things at once:
+              Econest Packaging started with a single belief — that packaging should do two things at once:
               carry the product and carry the brand. Over the years we have grown into a full-scale
               bag manufacturer serving hundreds of businesses across India.
             </p>
