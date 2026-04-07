@@ -15,6 +15,7 @@ function CartContent() {
   const setCount = useCartStore((s) => s.setCount);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     loadCart();
   }, []);
 
