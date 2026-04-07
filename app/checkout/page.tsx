@@ -109,7 +109,7 @@ function CheckoutContent() {
             amount,
             currency: "INR",
             order_id: razorpayOrderId,
-            name: "PieBags",
+            name: "Econest Packaging",
             description: "Non-Woven Bag Order",
             handler: async (response: any) => {
               try {
