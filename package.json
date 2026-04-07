@@ -5,12 +5,13 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "start": "next start -p 3001",
-    "build": "vite build",
+    "build": "next build",
     "lint": "eslint"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
     "@hookform/resolvers": "^5.2.2",
+    "@netlify/plugin-nextjs": "^5.15.9",
     "axios": "^1.13.6",
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.0",
