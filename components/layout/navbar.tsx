@@ -131,7 +131,7 @@ export function Navbar() {
           <div className="relative h-12 w-12 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-200 transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md group-hover:ring-pink-200">
             <Image
               src="/logo.png"
-              alt="Econest Packaging Logo"
+              alt="Shreeshyam Packaging Logo"
               fill
               className="object-contain p-1.5 transition duration-300 group-hover:scale-105"
               priority
@@ -143,7 +143,7 @@ export function Navbar() {
               Premium Bag Manufacturer
             </p>
             <h1 className="text-base font-bold tracking-tight text-zinc-900 transition duration-300 group-hover:text-pink-600 sm:text-lg lg:text-xl">
-              Econest Packaging
+              Shreeshyam Packaging
             </h1>
           </div>
         </Link>
@@ -258,7 +258,7 @@ export function Navbar() {
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
           <div className="mb-4 rounded-[1.5rem] bg-gradient-to-r from-pink-50 via-rose-50 to-fuchsia-50 p-4 shadow-sm ring-1 ring-pink-100">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-pink-500">
-              Econest Packaging
+              Shreeshyam Packaging
             </p>
             <p className="mt-2 text-sm leading-6 text-zinc-700">
               Premium non-woven bags for bulk orders, daily business packaging

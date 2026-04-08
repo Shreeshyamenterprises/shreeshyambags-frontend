@@ -328,7 +328,7 @@ export default function HomePage() {
               <SectionHeading
                 eyebrow="About Us"
                 title="Manufacturer You Can Trust for Repeat Business"
-                description="Econest Packaging is a Roorkee-based bag manufacturer supplying retailers, grocery chains, boutiques, sweet shops and distributors across India."
+                description="Shreeshyam Packaging is a Roorkee-based bag manufacturer supplying retailers, grocery chains, boutiques, sweet shops and distributors across India."
               />
               <div className="mt-8 space-y-4">
                 {[
@@ -448,7 +448,7 @@ export default function HomePage() {
                   <CheckCircle2 className="h-4 w-4 text-green-400" /> Call us: <span className="font-semibold text-white">+91 93895 17814</span>
                 </p>
                 <p className="flex items-center gap-2 text-sm text-zinc-400">
-                  <CheckCircle2 className="h-4 w-4 text-green-400" /> Email: <span className="font-semibold text-white">hello@econestpackaging.in</span>
+                  <CheckCircle2 className="h-4 w-4 text-green-400" /> Email: <span className="font-semibold text-white">hello@shreeshyampackaging.in</span>
                 </p>
               </div>
             </div>

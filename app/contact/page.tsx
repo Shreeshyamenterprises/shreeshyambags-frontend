@@ -40,8 +40,8 @@ const contactDetails = [
   {
     icon: <Mail className="h-5 w-5 text-blue-500" />,
     label: "Email",
-    value: "hello@econestpackaging.in",
-    href: "mailto:hello@econestpackaging.in",
+    value: "hello@shreeshyampackaging.in",
+    href: "mailto:hello@shreeshyampackaging.in",
   },
   {
     icon: <MapPin className="h-5 w-5 text-red-400" />,
@@ -118,7 +118,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 gap-3">
             {[
               { icon: <Phone className="h-4 w-4 text-pink-500" />, label: "Phone / WhatsApp", value: "+91 93895 17814" },
-              { icon: <Mail className="h-4 w-4 text-blue-500" />,  label: "Email", value: "hello@econestpackaging.in" },
+              { icon: <Mail className="h-4 w-4 text-blue-500" />,  label: "Email", value: "hello@shreeshyampackaging.in" },
               { icon: <Clock className="h-4 w-4 text-emerald-500" />, label: "Response Time", value: "Same day reply" },
               { icon: <MapPin className="h-4 w-4 text-orange-500" />, label: "Location", value: "Roorkee, Uttarakhand" },
             ].map(({ icon, label, value }) => (
