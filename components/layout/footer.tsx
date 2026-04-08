@@ -65,7 +65,7 @@ export function Footer() {
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="text-xl font-bold tracking-tight text-white">
-              Econest Packaging
+              Shreeshyam Packaging
             </Link>
             <p className="mt-4 text-sm leading-7 text-zinc-400">
               Premium non-woven bags for shops, boutiques, gifting brands, grocery
@@ -139,11 +139,11 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:hello@econestpackaging.in"
+                  href="mailto:hello@shreeshyampackaging.in"
                   className="flex items-start gap-3 text-sm transition hover:text-white"
                 >
                   <Mail className="mt-0.5 h-4 w-4 shrink-0 text-pink-400" />
-                  <span>hello@econestpackaging.in</span>
+                  <span>hello@shreeshyampackaging.in</span>
                 </a>
               </li>
               <li>
@@ -166,7 +166,7 @@ export function Footer() {
                 >
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-pink-400" />
                   <span>
-                    Econest Packaging<br />
+                    Shreeshyam Packaging<br />
                     Roorkee, Uttarakhand – 247667<br />
                     India
                   </span>
@@ -186,7 +186,7 @@ export function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-zinc-800">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-xs text-zinc-500 sm:flex-row sm:px-6 lg:px-8">
-          <p>© {new Date().getFullYear()} Econest Packaging. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Shreeshyam Packaging. All rights reserved.</p>
           <p>Stylish packaging · Reusable utility · Everyday brand visibility</p>
         </div>
       </div>

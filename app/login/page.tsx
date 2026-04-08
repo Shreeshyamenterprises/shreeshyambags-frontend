@@ -139,12 +139,12 @@ export default function LoginPage() {
                   <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-pink-200">
-                      Econest Packaging
+                      Shreeshyam Packaging
                     </span>
                   </div>
 
                   <h2 className="mt-4 text-2xl font-bold leading-snug text-white xl:text-3xl">
-                    Welcome back to Econest Packaging.
+                    Welcome back to Shreeshyam Packaging.
                   </h2>
                   <p className="mt-2 text-xs leading-6 text-zinc-300/90">
                     Login to manage your orders, request bulk quotes, compare GSM options and continue your custom packaging purchases.
@@ -193,7 +193,7 @@ export default function LoginPage() {
                 <div className="relative h-9 w-9 overflow-hidden rounded-xl bg-white ring-1 ring-zinc-200">
                   <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
                 </div>
-                <span className="text-sm font-bold tracking-tight text-zinc-800">Econest Packaging</span>
+                <span className="text-sm font-bold tracking-tight text-zinc-800">Shreeshyam Packaging</span>
               </div>
 
               {/* Heading */}

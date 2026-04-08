@@ -91,7 +91,7 @@ function ResetPasswordForm() {
         <div className="relative h-9 w-9 overflow-hidden rounded-xl bg-white ring-1 ring-zinc-200">
           <Image src="/logo.png" alt="Logo" fill className="object-contain p-1" />
         </div>
-        <span className="text-sm font-bold tracking-tight text-zinc-800">Econest Packaging</span>
+        <span className="text-sm font-bold tracking-tight text-zinc-800">Shreeshyam Packaging</span>
       </div>
 
       {!token ? (
@@ -275,7 +275,7 @@ export default function ResetPasswordPage() {
             <div className="relative hidden overflow-hidden lg:block">
               <Image
                 src="/signup-bag-sample.jpeg"
-                alt="Econest Packaging"
+                alt="Shreeshyam Packaging"
                 fill
                 priority
                 className="object-cover"
@@ -287,7 +287,7 @@ export default function ResetPasswordPage() {
                   <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-pink-200">
-                      Econest Packaging
+                      Shreeshyam Packaging
                     </span>
                   </div>
 
