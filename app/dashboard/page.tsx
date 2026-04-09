@@ -7,7 +7,6 @@ import {
   ShoppingBag,
   ClipboardList,
   ShoppingCart,
-  IndianRupee,
   Package,
   ChevronRight,
   MessageSquare,
@@ -26,6 +25,8 @@ import {
   X,
   Shield,
   TrendingUp,
+  BadgeCheck,
+  Plus,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/cart-store";
@@ -104,8 +105,8 @@ function DashboardSkeleton() {
           <div className="flex items-center gap-5">
             <div className="h-20 w-20 animate-pulse rounded-2xl bg-white/10" />
             <div className="space-y-2">
-              <div className="h-4 w-32 animate-pulse rounded bg-white/10" />
-              <div className="h-6 w-48 animate-pulse rounded bg-white/10" />
+              <div className="h-3 w-24 animate-pulse rounded bg-white/10" />
+              <div className="h-7 w-48 animate-pulse rounded bg-white/10" />
               <div className="h-3 w-40 animate-pulse rounded bg-white/10" />
             </div>
           </div>
@@ -115,13 +116,13 @@ function DashboardSkeleton() {
         </div>
       </div>
       <div className="mx-auto max-w-5xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+        <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
           <div className="space-y-4">
             <Skeleton className="h-72" />
             <Skeleton className="h-40" />
           </div>
           <div className="space-y-4">
-            <Skeleton className="h-64" />
+            <Skeleton className="h-72" />
             <Skeleton className="h-28" />
           </div>
         </div>
@@ -177,18 +178,24 @@ function EditProfileDrawer({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
-        {/* Handle */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md overflow-hidden rounded-t-[2rem] bg-white shadow-2xl sm:rounded-[2rem]">
+
+        {/* Drag handle (mobile) */}
         <div className="flex items-center justify-center pt-3 sm:hidden">
           <div className="h-1 w-10 rounded-full bg-zinc-200" />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 pb-4 pt-5">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-pink-500">Account</p>
-            <h3 className="mt-0.5 text-lg font-bold text-zinc-900">Edit Profile</h3>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-pink-50 ring-1 ring-pink-100">
+              <Pencil className="h-4 w-4 text-pink-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-pink-500">Account</p>
+              <h3 className="text-base font-bold text-zinc-900">Edit Profile</h3>
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -222,7 +229,11 @@ function EditProfileDrawer({
           {/* Phone */}
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-zinc-600">Phone Number</label>
-            <div className="flex overflow-hidden rounded-xl border border-zinc-200 bg-white transition focus-within:border-pink-400 focus-within:ring-2 focus-within:ring-pink-100">
+            <div className={`flex overflow-hidden rounded-xl border bg-white transition focus-within:ring-2 ${
+              errors.phone
+                ? "border-red-300 focus-within:ring-red-100"
+                : "border-zinc-200 focus-within:border-pink-400 focus-within:ring-pink-100"
+            }`}>
               <span className="flex items-center border-r border-zinc-100 bg-zinc-50 px-3 text-xs font-bold text-zinc-500 select-none">
                 +91
               </span>
@@ -243,7 +254,7 @@ function EditProfileDrawer({
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-zinc-600">Email Address</label>
             <div className="flex items-center gap-2 rounded-xl border border-zinc-100 bg-zinc-50 px-3.5 py-3 text-sm text-zinc-500">
-              <Mail className="h-4 w-4 text-zinc-400" />
+              <Mail className="h-4 w-4 shrink-0 text-zinc-400" />
               <span className="flex-1 truncate">{user.email}</span>
               <span className="rounded-full bg-zinc-200 px-2 py-0.5 text-[10px] font-semibold text-zinc-500">Read only</span>
             </div>
@@ -251,7 +262,7 @@ function EditProfileDrawer({
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 px-6 pb-8 pt-4 sm:pb-6">
+        <div className="flex gap-3 px-6 pb-8 pt-5 sm:pb-6">
           <button
             onClick={handleSave}
             disabled={saving}
@@ -272,12 +283,138 @@ function EditProfileDrawer({
   );
 }
 
+// ── Profile Card ───────────────────────────────────────────────────────────────
+
+function ProfileCard({
+  user,
+  initials,
+  memberSince,
+  onEdit,
+}: {
+  user: UserProfile;
+  initials: string;
+  memberSince: string | null;
+  onEdit: () => void;
+}) {
+  const isAdmin = user.role === "ADMIN";
+
+  return (
+    <div className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-zinc-100">
+
+      {/* Dark header with avatar */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 px-5 pb-6 pt-5">
+        {/* Subtle glow */}
+        <div className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-pink-500/15 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-4 left-1/3 h-20 w-20 rounded-full bg-fuchsia-500/10 blur-xl" />
+
+        {/* Edit button */}
+        <div className="relative flex items-start justify-between">
+          <div className="flex items-center gap-1.5 rounded-full bg-white/8 px-2.5 py-1 ring-1 ring-white/10">
+            <span className={`h-1.5 w-1.5 rounded-full ${isAdmin ? "bg-amber-400" : "bg-emerald-400"}`} />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-300">
+              {isAdmin ? "Admin" : "Member"}
+            </span>
+          </div>
+          <button
+            onClick={onEdit}
+            className="flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/8 px-3 py-1.5 text-xs font-semibold text-zinc-300 backdrop-blur transition hover:bg-white/15 hover:text-white active:scale-95"
+          >
+            <Pencil className="h-3 w-3" /> Edit
+          </button>
+        </div>
+
+        {/* Avatar + name */}
+        <div className="relative mt-4 flex flex-col items-center gap-2 text-center">
+          <div className="relative">
+            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-fuchsia-600 text-2xl font-black text-white shadow-xl shadow-pink-900/40 ring-2 ring-white/10">
+              {initials}
+            </div>
+            <span className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400 ring-2 ring-zinc-800">
+              <BadgeCheck className="h-3.5 w-3.5 text-white" />
+            </span>
+          </div>
+          <div>
+            <p className="mt-1 text-base font-bold text-white">{user.name ?? "No name set"}</p>
+            <p className="text-xs text-zinc-400">{isAdmin ? "Administrator" : "Customer Account"}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Info rows */}
+      <div className="divide-y divide-zinc-50 px-5 py-1">
+        {/* Email */}
+        <div className="flex items-center gap-3 py-3.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+            <Mail className="h-3.5 w-3.5 text-blue-400" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Email</p>
+            <p className="truncate text-sm font-medium text-zinc-700">{user.email}</p>
+          </div>
+        </div>
+
+        {/* Phone */}
+        <div className="flex items-center gap-3 py-3.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50">
+            <Phone className="h-3.5 w-3.5 text-emerald-400" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Phone</p>
+            {user.phone ? (
+              <p className="text-sm font-medium text-zinc-700">+91 {user.phone}</p>
+            ) : (
+              <button
+                onClick={onEdit}
+                className="flex items-center gap-1 text-sm font-medium text-pink-500 transition hover:text-pink-600"
+              >
+                <Plus className="h-3.5 w-3.5" /> Add phone number
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Member since */}
+        <div className="flex items-center gap-3 py-3.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-violet-50">
+            <Calendar className="h-3.5 w-3.5 text-violet-400" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Member Since</p>
+            <p className="text-sm font-medium text-zinc-700">{memberSince ?? "—"}</p>
+          </div>
+        </div>
+
+        {/* Role */}
+        <div className="flex items-center gap-3 py-3.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-50">
+            <Shield className="h-3.5 w-3.5 text-amber-400" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Account Type</p>
+            <p className="text-sm font-medium text-zinc-700">{isAdmin ? "Administrator" : "Customer"}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Membership badge */}
+      <div className="mx-4 mb-4 mt-1 flex items-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-400 px-4 py-3 shadow-sm shadow-amber-200">
+        <Star className="h-4 w-4 shrink-0 text-amber-900/70" />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold text-amber-900">Shreeshyam Member</p>
+          <p className="truncate text-[10px] text-amber-800/80">Verified packaging customer</p>
+        </div>
+        <BadgeCheck className="h-4 w-4 shrink-0 text-amber-900/60" />
+      </div>
+    </div>
+  );
+}
+
 // ── Main Content ───────────────────────────────────────────────────────────────
 
 function DashboardContent() {
-  const [user, setUser]     = useState<UserProfile | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [cart, setCart]     = useState<CartResponse | null>(null);
+  const [user, setUser]       = useState<UserProfile | null>(null);
+  const [orders, setOrders]   = useState<Order[]>([]);
+  const [cart, setCart]       = useState<CartResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const setCount = useCartStore((s) => s.setCount);
@@ -324,6 +461,13 @@ function DashboardContent() {
     ? new Date(user.createdAt).toLocaleDateString("en-IN", { month: "long", year: "numeric" })
     : null;
 
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 17) return "Good afternoon";
+    return "Good evening";
+  })();
+
   if (loading) return <DashboardSkeleton />;
 
   return (
@@ -339,18 +483,17 @@ function DashboardContent() {
 
       {/* ── Hero Banner ── */}
       <div className="relative overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
-        {/* Ambient glows */}
         <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-pink-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-10 left-1/3 h-48 w-48 rounded-full bg-fuchsia-500/8 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 right-0 h-px w-full bg-gradient-to-r from-transparent via-pink-500/20 to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 h-px w-full bg-gradient-to-r from-transparent via-pink-500/20 to-transparent" />
 
         <div className="relative mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Profile row */}
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               {/* Avatar */}
               <div className="relative shrink-0">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-fuchsia-600 text-xl font-black text-white shadow-[0_0_0_3px_rgba(236,72,153,0.2)] sm:h-20 sm:w-20 sm:text-2xl">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-fuchsia-600 text-xl font-black text-white shadow-xl shadow-pink-900/40 ring-2 ring-white/10 sm:h-[72px] sm:w-[72px] sm:text-2xl">
                   {initials}
                 </div>
                 <span className="absolute -bottom-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400 ring-2 ring-zinc-900">
@@ -360,17 +503,8 @@ function DashboardContent() {
 
               {/* Info */}
               <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-pink-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-pink-400 ring-1 ring-pink-500/20">
-                    {user?.role === "ADMIN" ? "Admin" : "Member"}
-                  </span>
-                  {memberSince && (
-                    <span className="flex items-center gap-1 text-[10px] text-zinc-500">
-                      <Calendar className="h-2.5 w-2.5" />Since {memberSince}
-                    </span>
-                  )}
-                </div>
-                <h1 className="mt-1.5 text-2xl font-black tracking-tight text-white sm:text-3xl">
+                <p className="text-xs text-zinc-500">{greeting}</p>
+                <h1 className="mt-0.5 text-2xl font-black tracking-tight text-white sm:text-3xl">
                   {user?.name ? user.name.split(" ")[0] : "My Account"}
                 </h1>
                 <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
@@ -389,7 +523,7 @@ function DashboardContent() {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setEditOpen(true)}
                 className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/8 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15 active:scale-95"
@@ -404,7 +538,7 @@ function DashboardContent() {
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 rounded-xl border border-white/8 px-4 py-2 text-sm font-semibold text-zinc-400 transition hover:border-red-400/30 hover:text-red-400 active:scale-95"
+                className="flex items-center gap-2 rounded-xl border border-white/8 px-3.5 py-2 text-sm font-semibold text-zinc-400 transition hover:border-red-400/30 hover:text-red-400 active:scale-95"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Logout</span>
@@ -415,10 +549,10 @@ function DashboardContent() {
           {/* Stats strip */}
           <div className="mt-7 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             {[
-              { label: "Total Orders",  value: String(totalOrders),              icon: ClipboardList, href: "/orders",   accent: "text-blue-300" },
-              { label: "In Cart",       value: String(cartItemsCount) + " items", icon: ShoppingCart,  href: "/cart",    accent: "text-pink-300" },
-              { label: "Cart Value",    value: fmt(cart?.subtotal ?? 0),          icon: ShoppingBag,   href: "/cart",    accent: "text-violet-300" },
-              { label: "Total Spent",   value: fmt(totalSpent),                   icon: TrendingUp,    href: null,       accent: "text-emerald-300" },
+              { label: "Total Orders",  value: String(totalOrders),               icon: ClipboardList, href: "/orders", accent: "text-blue-300"    },
+              { label: "In Cart",       value: `${cartItemsCount} item${cartItemsCount !== 1 ? "s" : ""}`, icon: ShoppingCart, href: "/cart", accent: "text-pink-300" },
+              { label: "Cart Value",    value: fmt(cart?.subtotal ?? 0),           icon: ShoppingBag,   href: "/cart",   accent: "text-violet-300" },
+              { label: "Total Spent",   value: fmt(totalSpent),                    icon: TrendingUp,    href: null,      accent: "text-emerald-300" },
             ].map(({ label, value, icon: Icon, href, accent }) => {
               const inner = (
                 <div className={`group relative flex items-center gap-3 overflow-hidden rounded-2xl bg-white/6 px-4 py-3.5 ring-1 ring-white/8 transition ${href ? "hover:bg-white/10 hover:ring-white/15" : ""}`}>
@@ -487,9 +621,13 @@ function DashboardContent() {
                       : "Recent";
 
                     return (
-                      <div key={order.id} className="flex items-center gap-4 px-5 py-4 transition hover:bg-zinc-50/60">
+                      <Link
+                        key={order.id}
+                        href="/orders"
+                        className="flex items-center gap-4 px-5 py-4 transition hover:bg-zinc-50/70"
+                      >
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-pink-50 ring-1 ring-pink-100">
-                          <Package className="h-4.5 w-4.5 text-pink-400" />
+                          <Package className="h-4 w-4 text-pink-400" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold text-zinc-900">{title}</p>
@@ -501,7 +639,7 @@ function DashboardContent() {
                           <p className="text-sm font-bold text-zinc-900">{fmt(order.total)}</p>
                           <StatusPill status={order.status ?? "CREATED"} />
                         </div>
-                      </div>
+                      </Link>
                     );
                   })}
                 </div>
@@ -524,10 +662,10 @@ function DashboardContent() {
               <p className="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-zinc-400">Quick Access</p>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { href: "/orders",   icon: ClipboardList, label: "My Orders",     desc: `${totalOrders} order${totalOrders !== 1 ? "s" : ""}`,    iconBg: "bg-blue-50",    iconColor: "text-blue-500"    },
-                  { href: "/cart",     icon: ShoppingCart,  label: "My Cart",       desc: `${cartItemsCount} item${cartItemsCount !== 1 ? "s" : ""} in cart`, iconBg: "bg-pink-50",    iconColor: "text-pink-500"    },
-                  { href: "/products", icon: Layers,        label: "Browse Bags",   desc: "Explore the catalog",                                   iconBg: "bg-violet-50",  iconColor: "text-violet-500"  },
-                  { href: "/contact",  icon: MessageSquare, label: "Bulk Enquiry",  desc: "Custom print & large orders",                           iconBg: "bg-emerald-50", iconColor: "text-emerald-500" },
+                  { href: "/orders",   icon: ClipboardList, label: "My Orders",    desc: `${totalOrders} order${totalOrders !== 1 ? "s" : ""}`,                       iconBg: "bg-blue-50",    iconColor: "text-blue-500"    },
+                  { href: "/cart",     icon: ShoppingCart,  label: "My Cart",      desc: `${cartItemsCount} item${cartItemsCount !== 1 ? "s" : ""} in cart`,          iconBg: "bg-pink-50",    iconColor: "text-pink-500"    },
+                  { href: "/products", icon: Layers,        label: "Browse Bags",  desc: "Explore the catalog",                                                        iconBg: "bg-violet-50",  iconColor: "text-violet-500"  },
+                  { href: "/contact",  icon: MessageSquare, label: "Bulk Enquiry", desc: "Custom print & large orders",                                                iconBg: "bg-emerald-50", iconColor: "text-emerald-500" },
                 ].map(({ href, icon: Icon, label, desc, iconBg, iconColor }) => (
                   <Link
                     key={label}
@@ -552,57 +690,12 @@ function DashboardContent() {
           <div className="space-y-4">
 
             {/* Profile card */}
-            <div className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-zinc-100">
-              <div className="flex items-center justify-between px-5 py-4">
-                <p className="text-sm font-bold text-zinc-900">Profile</p>
-                <button
-                  onClick={() => setEditOpen(true)}
-                  className="flex items-center gap-1.5 rounded-xl border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-zinc-600 transition hover:bg-zinc-50"
-                >
-                  <Pencil className="h-3 w-3" /> Edit
-                </button>
-              </div>
-
-              {/* Avatar */}
-              <div className="flex flex-col items-center gap-2 bg-gradient-to-b from-zinc-50 to-white px-5 py-5">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-fuchsia-600 text-xl font-black text-white shadow-lg shadow-pink-200">
-                  {initials}
-                </div>
-                <div className="text-center">
-                  <p className="font-bold text-zinc-900">{user?.name ?? "—"}</p>
-                  <p className="text-xs text-zinc-400">{user?.role === "ADMIN" ? "Administrator" : "Customer Account"}</p>
-                </div>
-              </div>
-
-              {/* Details list */}
-              <div className="divide-y divide-zinc-50 px-5 pb-4">
-                {[
-                  { icon: Mail,     label: "Email",  value: user?.email ?? "—",                     color: "text-zinc-400" },
-                  { icon: Phone,    label: "Phone",  value: user?.phone ? `+91 ${user.phone}` : "Not added", color: "text-zinc-400" },
-                  { icon: Calendar, label: "Since",  value: memberSince ?? "—",                     color: "text-zinc-400" },
-                  { icon: Shield,   label: "Role",   value: user?.role === "ADMIN" ? "Administrator" : "Customer", color: "text-emerald-500" },
-                ].map(({ icon: Icon, label, value, color }) => (
-                  <div key={label} className="flex items-center gap-3 py-3">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-50 ring-1 ring-zinc-100">
-                      <Icon className={`h-3.5 w-3.5 ${color}`} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">{label}</p>
-                      <p className="truncate text-sm font-medium text-zinc-700">{value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Membership badge */}
-              <div className="mx-4 mb-4 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-50 px-4 py-3 ring-1 ring-amber-100">
-                <Star className="h-4 w-4 shrink-0 text-amber-400" />
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-amber-800">Shreeshyam Member</p>
-                  <p className="truncate text-[10px] text-amber-600">Verified packaging customer</p>
-                </div>
-              </div>
-            </div>
+            <ProfileCard
+              user={user!}
+              initials={initials}
+              memberSince={memberSince}
+              onEdit={() => setEditOpen(true)}
+            />
 
             {/* WhatsApp support */}
             <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#25d366] to-[#128c7e] p-5 shadow-md shadow-green-200">
@@ -612,7 +705,7 @@ function DashboardContent() {
                 </div>
                 <div>
                   <p className="font-bold text-white">Need Help?</p>
-                  <p className="mt-0.5 text-xs text-green-100 leading-4">We reply within minutes — reach us directly on WhatsApp.</p>
+                  <p className="mt-0.5 text-xs leading-4 text-green-100">We reply within minutes — reach us directly on WhatsApp.</p>
                 </div>
               </div>
               <a
@@ -629,7 +722,7 @@ function DashboardContent() {
             <div className="relative overflow-hidden rounded-3xl bg-zinc-900 p-5">
               <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-pink-500/15 blur-xl" />
               <p className="text-[10px] font-bold uppercase tracking-widest text-pink-400">Bulk Ordering</p>
-              <h3 className="mt-2 text-base font-bold text-white leading-snug">Ready for your next order?</h3>
+              <h3 className="mt-2 text-base font-bold leading-snug text-white">Ready for your next order?</h3>
               <p className="mt-1.5 text-xs leading-5 text-zinc-400">
                 Custom bags, logo printing and wholesale pricing — all in one place.
               </p>
