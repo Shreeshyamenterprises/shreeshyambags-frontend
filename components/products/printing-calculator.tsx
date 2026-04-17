@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { Variant } from "@/types";
 
 export function PrintingCalculator({ variant }: { variant: Variant }) {
@@ -59,15 +60,18 @@ export function PrintingCalculator({ variant }: { variant: Variant }) {
           Print Colors
         </label>
 
-        <select
-          value={colors}
-          onChange={(e) => setColors(Number(e.target.value))}
-          className="mt-2 w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm"
-        >
-          <option value={1}>1 Color</option>
-          <option value={2}>2 Colors</option>
-          <option value={3}>3+ Colors</option>
-        </select>
+        <div className="relative mt-2">
+          <select
+            value={colors}
+            onChange={(e) => setColors(Number(e.target.value))}
+            className="w-full appearance-none cursor-pointer rounded-xl border border-zinc-300 bg-white px-4 py-3 pr-10 text-sm text-zinc-900 outline-none transition focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+          >
+            <option value={1}>1 Color</option>
+            <option value={2}>2 Colors</option>
+            <option value={3}>3+ Colors</option>
+          </select>
+          <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+        </div>
       </div>
 
       {/* RESULTS */}

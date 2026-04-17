@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, ShoppingBag, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCartStore } from "@/store/cart-store";
 import { useAuthStore } from "@/store/auth-store";
 import { api } from "@/lib/api";
@@ -82,6 +82,7 @@ export function Navbar() {
   const token    = useAuthStore((s) => s.token);
   const load     = useAuthStore((s) => s.load);
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Decode role from JWT payload without a library
   const isAdmin = (() => {
@@ -106,6 +107,28 @@ export function Navbar() {
       .catch(() => {});
   }, [loggedIn, setCount]);
 
+  // Close mobile menu on click outside or Escape key
+  useEffect(() => {
+    if (!open) return;
+
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [open]);
+
   const hideNavbar =
     pathname === "/login" ||
     pathname === "/signup" ||
@@ -121,7 +144,7 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/30 bg-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.05)] backdrop-blur-2xl">
+    <header ref={menuRef} className="sticky top-0 z-50 border-b border-white/30 bg-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.05)] backdrop-blur-2xl">
       <div className="mx-auto flex h-[74px] max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
         <Link
           href="/"

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Loader2 } from "lucide-react";
+import { ShoppingCart, Loader2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Variant } from "@/types";
 import { api } from "@/lib/api";
@@ -347,15 +347,18 @@ Estimated Total: ₹${totalCost}`
 
           <div>
             <SectionTitle title="Printing Colors" />
-            <select
-              value={printColors}
-              onChange={(e) => setPrintColors(Number(e.target.value))}
-              className="w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-pink-400"
-            >
-              <option value={1}>1 Color Print</option>
-              <option value={2}>2 Color Print</option>
-              <option value={3}>3+ Color Print</option>
-            </select>
+            <div className="relative">
+              <select
+                value={printColors}
+                onChange={(e) => setPrintColors(Number(e.target.value))}
+                className="w-full appearance-none cursor-pointer rounded-2xl border border-zinc-300 bg-white px-4 py-3 pr-10 text-sm text-zinc-900 outline-none transition focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+              >
+                <option value={1}>1 Color Print</option>
+                <option value={2}>2 Color Print</option>
+                <option value={3}>3+ Color Print</option>
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            </div>
           </div>
         </div>
 
