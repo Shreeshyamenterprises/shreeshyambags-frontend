@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { Variant } from "@/types";
 
 function parseSize(size: string) {
@@ -115,17 +116,20 @@ Estimated Total: ₹${totalCost}`;
           <label className="mb-2 block text-sm font-medium text-zinc-700">
             Variant
           </label>
-          <select
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-            className="w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm"
-          >
-            {variants.map((variant) => (
-              <option key={variant.id} value={variant.id}>
-                {variant.size} / {variant.color} / {variant.shape}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={selectedId}
+              onChange={(e) => setSelectedId(e.target.value)}
+              className="w-full appearance-none cursor-pointer rounded-2xl border border-zinc-300 bg-white px-4 py-3 pr-10 text-sm text-zinc-900 outline-none transition focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+            >
+              {variants.map((variant) => (
+                <option key={variant.id} value={variant.id}>
+                  {variant.size} / {variant.color} / {variant.shape}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          </div>
         </div>
 
         <div>
@@ -144,15 +148,18 @@ Estimated Total: ₹${totalCost}`;
           <label className="mb-2 block text-sm font-medium text-zinc-700">
             Printing
           </label>
-          <select
-            value={printColors}
-            onChange={(e) => setPrintColors(Number(e.target.value))}
-            className="w-full rounded-2xl border border-zinc-300 px-4 py-3 text-sm"
-          >
-            <option value={1}>1 Color Print</option>
-            <option value={2}>2 Color Print</option>
-            <option value={3}>3+ Color Print</option>
-          </select>
+          <div className="relative">
+            <select
+              value={printColors}
+              onChange={(e) => setPrintColors(Number(e.target.value))}
+              className="w-full appearance-none cursor-pointer rounded-2xl border border-zinc-300 bg-white px-4 py-3 pr-10 text-sm text-zinc-900 outline-none transition focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+            >
+              <option value={1}>1 Color Print</option>
+              <option value={2}>2 Color Print</option>
+              <option value={3}>3+ Color Print</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          </div>
         </div>
 
         <div className="rounded-2xl bg-zinc-50 p-4">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { Variant } from "@/types";
@@ -85,18 +86,21 @@ export function BulkQuoteForm({
           <label className="mb-2 block text-sm font-medium text-zinc-700">
             Variant
           </label>
-          <select
-            value={selectedVariantId}
-            onChange={(e) => setSelectedVariantId(e.target.value)}
-            className="w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-pink-400"
-          >
-            {variants.map((variant) => (
-              <option key={variant.id} value={variant.id}>
-                {variant.size} / {variant.color} / {variant.shape}
-                {variant.gsm ? ` / ${variant.gsm} GSM` : ""}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={selectedVariantId}
+              onChange={(e) => setSelectedVariantId(e.target.value)}
+              className="w-full appearance-none cursor-pointer rounded-2xl border border-zinc-300 bg-white px-4 py-3 pr-10 text-sm text-zinc-900 outline-none transition focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+            >
+              {variants.map((variant) => (
+                <option key={variant.id} value={variant.id}>
+                  {variant.size} / {variant.color} / {variant.shape}
+                  {variant.gsm ? ` / ${variant.gsm} GSM` : ""}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
